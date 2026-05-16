@@ -33,6 +33,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Update Version
+        working-directory: packages/event-tracker
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -41,8 +42,13 @@ jobs:
           git push --set-upstream origin release/${{ github.event.inputs.version }}
           git push --tags
 
+      - name: Run Tests
+        working-directory: packages/event-tracker
+        run: pnpm run ci:test
+
       - name: Build Package
-        run: pnpm build
+        working-directory: packages/event-tracker
+        run: pnpm run build
 
       - name: Create GitHub Release
         env:
@@ -53,6 +59,7 @@ jobs:
             --generate-notes
 
       - name: Publish to npm
+        working-directory: packages/event-tracker
         run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
